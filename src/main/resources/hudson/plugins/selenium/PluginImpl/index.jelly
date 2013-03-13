@@ -1,0 +1,54 @@
+<!--
+  Displays the state of Selenium Grid
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <l:layout permission="${app.ADMINISTER}" title="Selenium">
+    <st:include page="sidepanel.jelly" />
+
+    <l:main-panel>
+      <h1>${%Registered Remote Controls}</h1>
+
+      <j:choose>
+        <j:when test="${it.masterHostName==null}">
+          <div class="warning">
+            ${%MissingMasterUrlConfiguration(rootURL)}
+          </div>
+        </j:when>
+        <j:otherwise>
+          <div>
+            ${%RunningAt(it.masterHostName,it.port)}
+            ${%ConnectFrom1}
+          </div>
+          <pre style="margin:1em">Selenium selenium = new DefaultSelenium("${it.masterHostName}", ${it.port}, "*firefox", "http://jenkins-ci.org/");</pre>
+          <div>
+            ${%ConnectFrom2}
+          </div>
+          <pre style="margin:1em">WebDriver driver = new RemoteWebDriver(new URL("http://${it.masterHostName}:${it.port}/wd/hub"), capability);</pre>
+        </j:otherwise>
+      </j:choose>
+
+      <j:set var="rcs" value="${it.remoteControls}" />
+      <j:choose>
+        <j:when test="${!empty(rcs)}">
+          <table class="sortable pane bigtable">
+            <tr>
+              <th>${%Host}</th>
+              <th>${%Capabilities}</th>
+              <th>${%Status}</th>
+            </tr>
+            <j:forEach var="rc" items="${rcs}">
+              <tr>
+                <td>${rc.hostAndPort}</td>
+                <td>${rc.capabilities}</td>
+                <td>${rc.status}</td>
+              </tr>
+            </j:forEach>
+          </table>
+        </j:when>
+        <j:otherwise>
+          <p>${%No RCs have checked in yet. Have you started some slaves?}</p>
+        </j:otherwise>
+      </j:choose>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
